@@ -15,6 +15,7 @@ int poisonCount;
 int main() {
     Map *map = new Map();
     Snake *snake = new Snake('l'); // 처음엔 왼쪽방향으로 출발
+    WINDOW *scoreBoard; // 점수판
 
     setlocale(LC_ALL, "");
     initscr();
@@ -45,12 +46,22 @@ int main() {
     // init map
     map->initMap();
 
+    scoreBoard = newwin(10, 20, 3, 65);
+    wbkgd(scoreBoard, COLOR_PAIR(8));
+    wattron(scoreBoard, COLOR_PAIR(8));
+    mvwprintw(scoreBoard, 1, 5, "Score Board");
+    wborder(scoreBoard, '|','|','-','-',' ',' ',' ',' ');
+
+
     while (true) {
         map->updateSnake(*snake);
         map->getInput(*snake);
         map->generateApple(*snake);
         map->generatePoison(*snake);
         map->generateGate();
+        mvwprintw(scoreBoard, 2, 5, "B: %d / 10", snake->getLength());
+        mvwprintw(scoreBoard, 3, 5, "+: applecount...");
+        wrefresh(scoreBoard);
     }
     getch();
     endwin();
