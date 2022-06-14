@@ -359,12 +359,12 @@ void Map::generateApple(Snake &snake) {
                 ableToGenerate = false;
             }
         }
-        attron(COLOR_PAIR(4));
+        attron(COLOR_PAIR(8));
         board[r][c] = '5';
         board[r][c+1] = '5';
         mvprintw(r, c, "5");
         mvprintw(r, c+1, "5");
-        attroff(COLOR_PAIR(4));
+        attroff(COLOR_PAIR(8));
         appleCount++;
 
         appleLocation.first = r;
@@ -414,12 +414,12 @@ void Map::generatePoison(Snake &snake) {
                 ableToGenerate = false;
             }
         }
-        attron(COLOR_PAIR(3));
+        attron(COLOR_PAIR(9));
         board[r][c] = '6'; 
         board[r][c+1] = '6';
         mvprintw(r, c, "6");
         mvprintw(r, c+1, "6");
-        attroff(COLOR_PAIR(3));
+        attroff(COLOR_PAIR(9));
         poisonCount++;
 
         poisonLocation.first = r;
