@@ -20,15 +20,18 @@ int main() {
     setlocale(LC_ALL, "");
     initscr();
     start_color();
+    init_color(100, 1000, 1000, 1000); // plain white
+
     init_color(1, 950, 970, 1000); // floor
-    init_color(2, 0, 500, 0); // wall
-    init_color(3, 0, 888, 0); // corner
-    init_color(4, 500, 500, 0); // snake head
-    init_color(5, 900, 950, 250); // snake body
-    init_color(6, 400, 0, 400); // gate
-    init_color(7, 200, 80, 120); // snake tail
+    init_color(2, 10, 680, 980); // wall
+    init_color(3, 10, 560, 800); // corner
+    init_color(4, 1000, 800, 180); // snake head
+    init_color(5, 1000, 960, 240); // snake body
+    init_color(6, 0, 0, 0); // gate
+    init_color(7, 400, 250, 700); // snake tail
     init_color(8, 1000, 400, 250); // apple
     init_color(9, 400, 1000, 200); // poison
+    init_pair(10, 100, COLOR_BLACK); // scoreboard
     init_pair(1, 1, 1);
     init_pair(2, 2, 2);
     init_pair(3, 3, 3);
@@ -46,9 +49,9 @@ int main() {
     // init map
     map->initMap();
 
-    scoreBoard = newwin(10, 20, 3, 65);
-    wbkgd(scoreBoard, COLOR_PAIR(8));
-    wattron(scoreBoard, COLOR_PAIR(8));
+    scoreBoard = newwin(10, 20, 3, 55);
+    wbkgd(scoreBoard, COLOR_PAIR(10));
+    wattron(scoreBoard, COLOR_PAIR(10));
     mvwprintw(scoreBoard, 1, 5, "Score Board");
     wborder(scoreBoard, '|','|','-','-',' ',' ',' ',' ');
 
