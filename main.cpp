@@ -19,13 +19,24 @@ int main() {
     setlocale(LC_ALL, "");
     initscr();
     start_color();
-    init_pair(1, COLOR_BLACK, COLOR_BLACK); // floor - black
-    init_pair(2, COLOR_WHITE, COLOR_WHITE); // wall - white
-    init_pair(3, COLOR_CYAN, COLOR_CYAN); // wall corner - cyan
-    init_pair(4, COLOR_YELLOW, COLOR_YELLOW); // snake head
-    init_pair(5, COLOR_GREEN, COLOR_GREEN); // snake body
-    init_pair(6, COLOR_MAGENTA, COLOR_MAGENTA); // gate
-    init_pair(7, COLOR_BLUE, COLOR_BLUE); // tail
+    init_color(1, 950, 970, 1000); // floor
+    init_color(2, 0, 500, 0); // wall
+    init_color(3, 0, 888, 0); // corner
+    init_color(4, 500, 500, 0); // snake head
+    init_color(5, 900, 950, 250); // snake body
+    init_color(6, 400, 0, 400); // gate
+    init_color(7, 200, 80, 120); // snake tail
+    init_color(8, 1000, 400, 250); // apple
+    init_color(9, 400, 1000, 200); // poison
+    init_pair(1, 1, 1);
+    init_pair(2, 2, 2);
+    init_pair(3, 3, 3);
+    init_pair(4, 4, 4);
+    init_pair(5, 5, 5);
+    init_pair(6, 6, 6);
+    init_pair(7, 7, 7);
+    init_pair(8, 8, 8);
+    init_pair(9, 9, 9);
     
     keypad(stdscr, TRUE);
     curs_set(0);
