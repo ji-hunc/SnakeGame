@@ -52,12 +52,13 @@ int main() {
     
 
     while (true) {
+        map->updateScoreBoard(*snake);
         map->updateSnake(*snake);
         map->getInput(*snake);
+        map->updateScoreBoard(*snake);
         map->generateApple(*snake);
         map->generatePoison(*snake);
         map->generateGate();
-        map->updateScoreBoard(*snake);
     }
     getch();
     endwin();
