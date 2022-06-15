@@ -49,5 +49,6 @@ public:
     void generateApple(Snake &snake);
     void generatePoison(Snake &snake);
     void generateGate();
+    void updateScoreBoard(Snake &snake);
     tuple<int, int, char> checkFuture(int r, int c, char dir);
 };
