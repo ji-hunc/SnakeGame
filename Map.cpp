@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string>
+#include <unistd.h>
 using namespace std;
 
 extern int userInput;
@@ -43,12 +44,12 @@ bool missionComplete = false;
 void Map::initMap() {
     for (int i=0; i<25; i++) {
         for (int j=0; j<50; j++) {
-            if (board[i][j] == '0') {
+            if (board[stageLevel][i][j] == '0') {
                 attron(COLOR_PAIR(1));
                 printw("0");
                 attroff(COLOR_PAIR(1));
             }
-            else if (board[i][j] == '1') {
+            else if (board[stageLevel][i][j] == '1') {
                 attron(COLOR_PAIR(2));
                 printw("1");
                 attroff(COLOR_PAIR(2));
@@ -67,7 +68,7 @@ void Map::initMap() {
 bool Map::isCrashWithWall(Position head) {
     int headRow = head.row;
     int headCol = head.col;
-    return board[headRow][headCol] == '1';
+    return board[stageLevel][headRow][headCol] == '1';
 }
 // static time_t input_time = time(NULL);
 
@@ -152,7 +153,7 @@ tuple<int, int, char> Map::checkFuture(int r, int c, char dir) {
         indexCol = il;
     }
     for (int i=0; i<4; i++) {
-        if (board[r+indexRow[i]][c+indexCol[i]] == '0') {
+        if (board[stageLevel][r+indexRow[i]][c+indexCol[i]] == '0') {
             tuple <int, int, char> t1 = make_tuple(r+indexRow[i], c+indexCol[i], direction[i]);
             return t1;
         }
@@ -201,30 +202,30 @@ void Map::updateSnake(Snake &snake) {
     }
     if (isPassing) {
         if (!exit2) {
-            if (outDirection == 'l' && board[gateRow1][gateCol1-2] == '8') {
+            if (outDirection == 'l' && board[stageLevel][gateRow1][gateCol1-2] == '8') {
                 isPassing = false;
             } 
-            else if (outDirection == 'r' && board[gateRow1][gateCol1+2] == '8') {
+            else if (outDirection == 'r' && board[stageLevel][gateRow1][gateCol1+2] == '8') {
                 isPassing = false;
             } 
-            else if (outDirection == 'u' && board[gateRow1-1][gateCol1] == '8') {
+            else if (outDirection == 'u' && board[stageLevel][gateRow1-1][gateCol1] == '8') {
                 isPassing = false;
             } 
-            else if (outDirection == 'd' && board[gateRow1+1][gateCol1] == '8'){
+            else if (outDirection == 'd' && board[stageLevel][gateRow1+1][gateCol1] == '8'){
                 isPassing = false;
             }
         }
         else {
-            if (outDirection == 'l' && board[gateRow2][gateCol2-2] == '8') {
+            if (outDirection == 'l' && board[stageLevel][gateRow2][gateCol2-2] == '8') {
                 isPassing = false;
             } 
-            else if (outDirection == 'r' && board[gateRow2][gateCol2+2] == '8') {
+            else if (outDirection == 'r' && board[stageLevel][gateRow2][gateCol2+2] == '8') {
                 isPassing = false;
             } 
-            else if (outDirection == 'u' && board[gateRow2-1][gateCol2] == '8') {
+            else if (outDirection == 'u' && board[stageLevel][gateRow2-1][gateCol2] == '8') {
                 isPassing = false;
             } 
-            else if (outDirection == 'd' && board[gateRow2+1][gateCol2] == '8'){
+            else if (outDirection == 'd' && board[stageLevel][gateRow2+1][gateCol2] == '8'){
                 isPassing = false;
             }
         }
@@ -238,6 +239,7 @@ void Map::updateSnake(Snake &snake) {
     int r = snake.location[0].row;
     int c = snake.location[0].col;
 
+    // eat Apple
     if (r == appleLocation.first && c == appleLocation.second) {
         snake.eatApple(appleLocation.first, appleLocation.second);
         appleCount--;
@@ -246,12 +248,13 @@ void Map::updateSnake(Snake &snake) {
             appleComplete = 'O';
         }
     }
+    // eat Poison
     if (r == poisonLocation.first && c == poisonLocation.second) {
         r = snake.location[snake.location.size()-1].row;
         c = snake.location[snake.location.size()-1].col;
         attron(COLOR_PAIR(1));
-        board[r][c] = '0';
-        board[r][c+1] = '0';
+        board[stageLevel][r][c] = '0';
+        board[stageLevel][r][c+1] = '0';
         mvprintw(r, c, "0"); 
         mvprintw(r, c+1, "0");
         attroff(COLOR_PAIR(1));
@@ -267,8 +270,8 @@ void Map::updateSnake(Snake &snake) {
     c = snake.location[0].col;
     // 머리가 아이템이랑 부딪혔나?
     attron(COLOR_PAIR(4));
-    board[r][c] = '3';
-    board[r][c+1] = '3';
+    board[stageLevel][r][c] = '3';
+    board[stageLevel][r][c+1] = '3';
     mvprintw(r, c, "3");
     mvprintw(r, c+1, "3");
     attroff(COLOR_PAIR(4));
@@ -278,8 +281,8 @@ void Map::updateSnake(Snake &snake) {
     //     r = snake.location[i].row;
     //     c = snake.location[i].col;
     //     attron(COLOR_PAIR(5));
-    //     board[r][c] = '4'; 
-    //     board[r][c+1] = '4'; 
+    //     board[stageLevel][r][c] = '4'; 
+    //     board[stageLevel][r][c+1] = '4'; 
     //     mvprintw(r, c, "4"); 
     //     mvprintw(r, c+1, "4");
     //     attroff(COLOR_PAIR(5));
@@ -290,8 +293,8 @@ void Map::updateSnake(Snake &snake) {
         r = snake.location[i].row;
         c = snake.location[i].col;
         attron(COLOR_PAIR(5));
-        board[r][c] = '4'; 
-        board[r][c+1] = '4'; 
+        board[stageLevel][r][c] = '4'; 
+        board[stageLevel][r][c+1] = '4'; 
         mvprintw(r, c, "4"); 
         mvprintw(r, c+1, "4");
         attroff(COLOR_PAIR(5));
@@ -300,8 +303,8 @@ void Map::updateSnake(Snake &snake) {
     r = snake.location[snake.location.size()-2].row;
     c = snake.location[snake.location.size()-2].col;
     attron(COLOR_PAIR(7));
-    board[r][c] = '8';
-    board[r][c+1] = '8';
+    board[stageLevel][r][c] = '8';
+    board[stageLevel][r][c+1] = '8';
     mvprintw(r, c, "8");
     mvprintw(r, c+1, "8");
     attroff(COLOR_PAIR(7));
@@ -311,8 +314,8 @@ void Map::updateSnake(Snake &snake) {
     refresh();
     // // 잔상 삭제
     // attron(COLOR_PAIR(1));
-    // board[r][c] = '0';
-    // board[r][c+1] = '0';
+    // board[stageLevel][r][c] = '0';
+    // board[stageLevel][r][c+1] = '0';
     // mvprintw(r, c, "0"); 
     // mvprintw(r, c+1, "0");
     // attroff(COLOR_PAIR(1));
@@ -320,8 +323,8 @@ void Map::updateSnake(Snake &snake) {
     r = snake.location[snake.location.size()-1].row;
     c = snake.location[snake.location.size()-1].col;
     attron(COLOR_PAIR(1));
-    board[r][c] = '0';
-    board[r][c+1] = '0';
+    board[stageLevel][r][c] = '0';
+    board[stageLevel][r][c+1] = '0';
     mvprintw(r, c, "0"); 
     mvprintw(r, c+1, "0");
     attroff(COLOR_PAIR(1));
@@ -345,7 +348,7 @@ void Map::updateSnake(Snake &snake) {
 void Map::printMap() {
     for (int i=0; i<25; i++) {
         for (int j=0; j<50; j++) {
-            cout << board[i][j];
+            cout << board[stageLevel][i][j];
         }
         cout << endl;
     }
@@ -362,8 +365,8 @@ void Map::generateApple(Snake &snake) {
         attron(COLOR_PAIR(1));
         r = appleLocation.first;
         c = appleLocation.second;
-        board[r][c] = '0';
-        board[r][c+1] = '0';
+        board[stageLevel][r][c] = '0';
+        board[stageLevel][r][c+1] = '0';
         mvprintw(r, c, "0"); 
         mvprintw(r, c+1, "0");
         attroff(COLOR_PAIR(1));
@@ -377,6 +380,9 @@ void Map::generateApple(Snake &snake) {
             c = rand() % 46 + 1;
             if (c % 2 != 0) {
                 c++;
+            }
+            if (board[stageLevel][r][c] != '0') {
+                continue;
             }
 
             for (int i=0; i<snake.location.size(); i++) {
@@ -393,8 +399,8 @@ void Map::generateApple(Snake &snake) {
             }
         }
         attron(COLOR_PAIR(8));
-        board[r][c] = '5';
-        board[r][c+1] = '5';
+        board[stageLevel][r][c] = '5';
+        board[stageLevel][r][c+1] = '5';
         mvprintw(r, c, "5");
         mvprintw(r, c+1, "5");
         attroff(COLOR_PAIR(8));
@@ -417,8 +423,8 @@ void Map::generatePoison(Snake &snake) {
         attron(COLOR_PAIR(1));
         r = poisonLocation.first;
         c = poisonLocation.second;
-        board[r][c] = '0';
-        board[r][c+1] = '0';
+        board[stageLevel][r][c] = '0';
+        board[stageLevel][r][c+1] = '0';
         mvprintw(r, c, "0"); 
         mvprintw(r, c+1, "0");
         attroff(COLOR_PAIR(1));
@@ -432,6 +438,9 @@ void Map::generatePoison(Snake &snake) {
             c = rand() % 46 + 1;
             if (c % 2 != 0) {
                 c++;
+            }
+            if (board[stageLevel][r][c] != '0') {
+                continue;
             }
 
             for (int i=0; i<snake.location.size(); i++) {
@@ -448,8 +457,8 @@ void Map::generatePoison(Snake &snake) {
             }
         }
         attron(COLOR_PAIR(9));
-        board[r][c] = '6'; 
-        board[r][c+1] = '6';
+        board[stageLevel][r][c] = '6'; 
+        board[stageLevel][r][c+1] = '6';
         mvprintw(r, c, "6");
         mvprintw(r, c+1, "6");
         attroff(COLOR_PAIR(9));
@@ -467,12 +476,12 @@ void Map::generateGate() {
     time_t now = time(NULL);
     if (now - gateStart > 5 && !isPassing) {
         attron(COLOR_PAIR(2));
-        board[gateRow1][gateCol1] = '1';
-        board[gateRow1][gateCol1+1] = '1';
-        mvprintw(gateRow1, gateCol1, "1"); 
+        board[stageLevel][gateRow1][gateCol1] = '1';
+        board[stageLevel][gateRow1][gateCol1+1] = '1';
+        mvprintw(gateRow1, gateCol1, "1");
         mvprintw(gateRow1, gateCol1+1, "1");
-        board[gateRow2][gateCol2] = '1';
-        board[gateRow2][gateCol2+1] = '1';
+        board[stageLevel][gateRow2][gateCol2] = '1';
+        board[stageLevel][gateRow2][gateCol2+1] = '1';
         mvprintw(gateRow2, gateCol2, "1"); 
         mvprintw(gateRow2, gateCol2+1, "1");
         attroff(COLOR_PAIR(2));
@@ -486,7 +495,7 @@ void Map::generateGate() {
         while (true) {
             x = rand() % 25;
             y = (rand() % 25) * 2;
-            if (board[x][y] == '1') {
+            if (board[stageLevel][x][y] == '1') {
                 gateRow1 = x;
                 gateCol1 = y;
                 break;
@@ -495,7 +504,7 @@ void Map::generateGate() {
         while (true) {
             x = rand() % 25;
             y = (rand() % 25) * 2;
-            if (board[x][y] == '1' && (x != gateRow1 || y != gateCol1)) {
+            if (board[stageLevel][x][y] == '1' && (x != gateRow1 || y != gateCol1)) {
                 gateRow2 = x;
                 gateCol2 = y;
                 findWall = true;
@@ -507,15 +516,15 @@ void Map::generateGate() {
     }
     
     attron(COLOR_PAIR(6));
-    board[gateRow1][gateCol1] = '7';
-    board[gateRow1][gateCol1+1] = '7';
+    board[stageLevel][gateRow1][gateCol1] = '7';
+    board[stageLevel][gateRow1][gateCol1+1] = '7';
     mvprintw(gateRow1, gateCol1, "7"); 
     mvprintw(gateRow1, gateCol1+1, "7");
     attroff(COLOR_PAIR(6));
 
     attron(COLOR_PAIR(6));
-    board[gateRow2][gateCol2] = '7';
-    board[gateRow2][gateCol2+1] = '7';
+    board[stageLevel][gateRow2][gateCol2] = '7';
+    board[stageLevel][gateRow2][gateCol2+1] = '7';
     mvprintw(gateRow2, gateCol2, "7");
     mvprintw(gateRow2, gateCol2+1, "7");
     attroff(COLOR_PAIR(6));
@@ -550,15 +559,24 @@ void Map::updateScoreBoard(Snake &snake){
     missionComplete = lengthComplete == 'O' && appleComplete == 'O' && poisonComplete == 'O' && gateComplete == 'O';
 
     if (missionComplete){
+        if (stageLevel == 3) {
+            terminate();
+        }
+        stageLevel++;
         wrefresh(complete);
         keypad(complete, TRUE);
         curs_set(0);
         noecho();
         
         scanw("");
+        snake.initSnake('l');
+        initMap();
         delwin(complete);
         endwin();
         clear();
+        appleScore = 0;
+        poisonScore = 0;
+        gateScore = 0;
         lengthComplete = ' ';
         appleComplete = ' ';
         poisonComplete = ' ';
