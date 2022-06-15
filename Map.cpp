@@ -28,6 +28,7 @@ WINDOW *scoreBoard; // 점수판
 WINDOW *missionBoard; // 미션판
 WINDOW *complete; // 미션 성공
 WINDOW *gameover; // 미션 실패
+bool wGameOver = false;
 int appleScore = 0;
 int poisonScore = 0;
 int gateScore = 0;
@@ -82,8 +83,7 @@ void Map::getInput(Snake &snake) {
             snake.setDirection('u');
         }
         else {
-            cout << "GAME OVER" << endl;
-            terminate();
+            wGameOver = true;
         }
     }
     else if (userInput == KEY_DOWN) {
@@ -91,8 +91,7 @@ void Map::getInput(Snake &snake) {
             snake.setDirection('d');
         }
         else {
-            cout << "GAME OVER" << endl;
-            terminate();
+            wGameOver = true;
         }
     }
     else if (userInput == KEY_LEFT) {
@@ -100,8 +99,7 @@ void Map::getInput(Snake &snake) {
             snake.setDirection('l');
         }
         else {
-            cout << "GAME OVER" << endl;
-            terminate();
+            wGameOver = true;
         }
     }
     else if (userInput == KEY_RIGHT) {
@@ -109,8 +107,7 @@ void Map::getInput(Snake &snake) {
             snake.setDirection('r');
         }
         else {
-            cout << "GAME OVER" << endl;
-            terminate();
+            wGameOver = true;
         }
     }
 }
@@ -231,11 +228,21 @@ void Map::updateSnake(Snake &snake) {
         }
     }
 
-    if (snake.isCrashMySelf() || isCrashWithWall(snake.location[0])) {
-        cout << "game Over" << endl;
+
+    if (snake.isCrashMySelf() || isCrashWithWall(snake.location[0]) || wGameOver) {
+        gameover = newwin(10, 35, 8, 8);
+        wbkgd(gameover, COLOR_PAIR(10));
+        mvwprintw(gameover, 3, 12, "Game Over!!!");
+        mvwprintw(gameover, 5, 6, "Press Enter to quit game");
+        wrefresh(gameover);
+        keypad(complete, TRUE);
+        curs_set(0);
+        noecho();
+        scanw("");
         clear();
-        exit(0);
-    }
+        delwin(gameover);
+        endwin();
+
 
     int r = snake.location[0].row;
     int c = snake.location[0].col;
@@ -332,8 +339,8 @@ void Map::updateSnake(Snake &snake) {
     
 
     if (snake.getLength() == 4) {
-        cout << "GAME OVER" << endl;
-        terminate();
+        wGameOver = true;
+        // terminate();
     }
     if (snake.getLength() >= MAX_LENGTH){
         lengthComplete = 'O';
@@ -551,30 +558,35 @@ void Map::updateScoreBoard(Snake &snake){
     mvwprintw(missionBoard, 7, 11, "G : %d (%c)", MAX_GATE, gateComplete);
 
     complete = newwin(10, 35, 8, 8);
+    wattron(complete, COLOR_PAIR(10));
     wborder(complete, '.', '.', '-', '-', 'o', 'o', 'o', 'o');
     mvwprintw(complete, 3, 8, "Mission Complete!!!");
-    mvwprintw(complete, 5, 3, "Press any key to continue game");
+    mvwprintw(complete, 5, 3, "Press Enter to continue game");
 
     wrefresh(scoreBoard);
     wrefresh(missionBoard);
     missionComplete = lengthComplete == 'O' && appleComplete == 'O' && poisonComplete == 'O' && gateComplete == 'O';
+    
 
     if (missionComplete){
         if (stageLevel == 3) {
             terminate();
         }
+        int continueInput = 0;
         stageLevel++;
         wrefresh(complete);
         keypad(complete, TRUE);
         curs_set(0);
         noecho();
-        
         scanw("");
+
+        
+        delwin(complete);
+        endwin();
         clear();
         snake.initSnake('l');
         initMap();
-        delwin(complete);
-        endwin();
+
         appleScore = 0;
         poisonScore = 0;
         gateScore = 0;
@@ -585,5 +597,8 @@ void Map::updateScoreBoard(Snake &snake){
         isPassing = false;
         appleCount = 0;
         poisonCount = 0;
+
     }
+    
+    
 }
