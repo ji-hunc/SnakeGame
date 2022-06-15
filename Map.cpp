@@ -45,7 +45,7 @@ void Map::initMap() {
     for (int i=0; i<25; i++) {
         for (int j=0; j<50; j++) {
             if (board[stageLevel][i][j] == '0') {
-                attron(COLOR_PAIR(1));
+                attron(COLOR_PAIR(1));  
                 printw("0");
                 attroff(COLOR_PAIR(1));
             }
@@ -233,7 +233,8 @@ void Map::updateSnake(Snake &snake) {
 
     if (snake.isCrashMySelf() || isCrashWithWall(snake.location[0])) {
         cout << "game Over" << endl;
-        terminate();
+        clear();
+        exit(0);
     }
 
     int r = snake.location[0].row;
@@ -569,11 +570,11 @@ void Map::updateScoreBoard(Snake &snake){
         noecho();
         
         scanw("");
+        clear();
         snake.initSnake('l');
         initMap();
         delwin(complete);
         endwin();
-        clear();
         appleScore = 0;
         poisonScore = 0;
         gateScore = 0;
@@ -581,5 +582,8 @@ void Map::updateScoreBoard(Snake &snake){
         appleComplete = ' ';
         poisonComplete = ' ';
         gateComplete = ' ';
+        isPassing = false;
+        appleCount = 0;
+        poisonCount = 0;
     }
 }
