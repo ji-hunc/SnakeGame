@@ -285,20 +285,8 @@ void Map::updateSnake(Snake &snake) {
     mvprintw(r, c+1, "3");
     attroff(COLOR_PAIR(4));
 
-    // 몸통 출력
-    for (int i=1; i<snake.getLength(); i++) {
-        r = snake.location[i].row;
-        c = snake.location[i].col;
-        attron(COLOR_PAIR(5));
-        board[stageLevel][r][c] = '4'; 
-        board[stageLevel][r][c+1] = '4'; 
-        mvprintw(r, c, "4"); 
-        mvprintw(r, c+1, "4");
-        attroff(COLOR_PAIR(5));
-    }
-
-    // // 몸통에서 꼬리만 뺴고 출력
-    // for (int i=1; i<snake.getLength()-1; i++) {
+    // // 몸통 출력
+    // for (int i=1; i<snake.getLength(); i++) {
     //     r = snake.location[i].row;
     //     c = snake.location[i].col;
     //     attron(COLOR_PAIR(5));
@@ -308,15 +296,27 @@ void Map::updateSnake(Snake &snake) {
     //     mvprintw(r, c+1, "4");
     //     attroff(COLOR_PAIR(5));
     // }
-    // // 꼬리만 출략
-    // r = snake.location[snake.location.size()-2].row;
-    // c = snake.location[snake.location.size()-2].col;
-    // attron(COLOR_PAIR(7));
-    // board[stageLevel][r][c] = '8';
-    // board[stageLevel][r][c+1] = '8';
-    // mvprintw(r, c, "8");
-    // mvprintw(r, c+1, "8");
-    // attroff(COLOR_PAIR(7));
+
+    // 몸통에서 꼬리만 뺴고 출력
+    for (int i=1; i<snake.getLength()-1; i++) {
+        r = snake.location[i].row;
+        c = snake.location[i].col;
+        attron(COLOR_PAIR(5));
+        board[stageLevel][r][c] = '4'; 
+        board[stageLevel][r][c+1] = '4'; 
+        mvprintw(r, c, "4"); 
+        mvprintw(r, c+1, "4");
+        attroff(COLOR_PAIR(5));
+    }
+    // 꼬리만 출략
+    r = snake.location[snake.location.size()-2].row;
+    c = snake.location[snake.location.size()-2].col;
+    attron(COLOR_PAIR(5));
+    board[stageLevel][r][c] = '8';
+    board[stageLevel][r][c+1] = '8';
+    mvprintw(r, c, "8");
+    mvprintw(r, c+1, "8");
+    attroff(COLOR_PAIR(5));
 
 
 
