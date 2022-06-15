@@ -8,6 +8,7 @@ private:
     int locationRow;
     int locationCol;
     int length = 6;
+    int maxLength = 6;
     char direction;
     // vector<Position> location;
 public:
@@ -24,6 +25,9 @@ public:
     int getLength() {
         return length;
     }
+    int getMaxLength(){
+        return maxLength;
+    }
     void move_up() {
         locationRow--;
     }
@@ -35,6 +39,11 @@ public:
     }
     void move_left() {
         locationCol--;
+    }
+    void updateMaxLength(){
+        if (length > maxLength){
+            maxLength = length;
+        }
     }
     void eatApple(int appleR, int appleC) {
         length++;

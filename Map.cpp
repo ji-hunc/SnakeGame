@@ -37,10 +37,11 @@ char appleComplete = ' ';
 char poisonComplete = ' ';
 char gateComplete = ' ';
 bool missionComplete = false;
-#define MAX_LENGTH 5
-#define MAX_APPLE 2
-#define MAX_POISON 1
-#define MAX_GATE 1
+const int MAX_LENGTH[4] = {7,8,9,10};
+const int  MAX_APPLE[4] = {2,3,4,5};
+const int  MAX_POISON[4] = {1,2,3,4};
+const int  MAX_GATE[4] = {1,2,3,4};
+
 
 void Map::initMap() {
     for (int i=0; i<25; i++) {
@@ -175,7 +176,7 @@ void Map::updateSnake(Snake &snake) {
     if (snake.location[0].row == gateRow1 && snake.location[0].col == gateCol1 || snake.location[0].row == gateRow2 && snake.location[0].col == gateCol2) {
         isPassing = true;
         gateScore++;
-        if (gateScore == MAX_GATE){
+        if (gateScore == MAX_GATE[stageLevel]){
             gateComplete = 'O';
         }
         if (snake.location[0].row == gateRow1 && snake.location[0].col == gateCol1) {
@@ -252,7 +253,7 @@ void Map::updateSnake(Snake &snake) {
         snake.eatApple(appleLocation.first, appleLocation.second);
         appleCount--;
         appleScore++;
-        if (appleScore == MAX_APPLE){
+        if (appleScore == MAX_APPLE[stageLevel]){
             appleComplete = 'O';
         }
     }
@@ -269,7 +270,7 @@ void Map::updateSnake(Snake &snake) {
         snake.eatPoison(poisonLocation.first, poisonLocation.second);
         poisonCount--;
         poisonScore++;
-        if (poisonScore == MAX_POISON){
+        if (poisonScore == MAX_POISON[stageLevel]){
             poisonComplete = 'O';
         }
     }
@@ -285,19 +286,7 @@ void Map::updateSnake(Snake &snake) {
     attroff(COLOR_PAIR(4));
 
     // 몸통 출력
-    // for (int i=1; i<snake.getLength(); i++) {
-    //     r = snake.location[i].row;
-    //     c = snake.location[i].col;
-    //     attron(COLOR_PAIR(5));
-    //     board[stageLevel][r][c] = '4'; 
-    //     board[stageLevel][r][c+1] = '4'; 
-    //     mvprintw(r, c, "4"); 
-    //     mvprintw(r, c+1, "4");
-    //     attroff(COLOR_PAIR(5));
-    // }
-
-    // 몸통에서 꼬리만 뺴고 출력
-    for (int i=1; i<snake.getLength()-1; i++) {
+    for (int i=1; i<snake.getLength(); i++) {
         r = snake.location[i].row;
         c = snake.location[i].col;
         attron(COLOR_PAIR(5));
@@ -307,15 +296,27 @@ void Map::updateSnake(Snake &snake) {
         mvprintw(r, c+1, "4");
         attroff(COLOR_PAIR(5));
     }
-    // 꼬리만 출략
-    r = snake.location[snake.location.size()-2].row;
-    c = snake.location[snake.location.size()-2].col;
-    attron(COLOR_PAIR(7));
-    board[stageLevel][r][c] = '8';
-    board[stageLevel][r][c+1] = '8';
-    mvprintw(r, c, "8");
-    mvprintw(r, c+1, "8");
-    attroff(COLOR_PAIR(7));
+
+    // // 몸통에서 꼬리만 뺴고 출력
+    // for (int i=1; i<snake.getLength()-1; i++) {
+    //     r = snake.location[i].row;
+    //     c = snake.location[i].col;
+    //     attron(COLOR_PAIR(5));
+    //     board[stageLevel][r][c] = '4'; 
+    //     board[stageLevel][r][c+1] = '4'; 
+    //     mvprintw(r, c, "4"); 
+    //     mvprintw(r, c+1, "4");
+    //     attroff(COLOR_PAIR(5));
+    // }
+    // // 꼬리만 출략
+    // r = snake.location[snake.location.size()-2].row;
+    // c = snake.location[snake.location.size()-2].col;
+    // attron(COLOR_PAIR(7));
+    // board[stageLevel][r][c] = '8';
+    // board[stageLevel][r][c+1] = '8';
+    // mvprintw(r, c, "8");
+    // mvprintw(r, c+1, "8");
+    // attroff(COLOR_PAIR(7));
 
 
 
@@ -342,12 +343,13 @@ void Map::updateSnake(Snake &snake) {
         wGameOver = true;
         // terminate();
     }
-    if (snake.getLength() >= MAX_LENGTH){
+    if (snake.getLength() >= MAX_LENGTH[stageLevel]){
         lengthComplete = 'O';
     }
     else{
         lengthComplete = ' ';
     }
+    snake.updateMaxLength();
 
     // 0.5초 대기
     // usleep(500000);
@@ -543,7 +545,8 @@ void Map::updateScoreBoard(Snake &snake){
     wattron(scoreBoard, COLOR_PAIR(10));
     wborder(scoreBoard, '.','.','-','-','o','o','o','o');
     mvwprintw(scoreBoard, 2, 9, "Score Board");
-    mvwprintw(scoreBoard, 4, 10, "B : %d / %d", snake.getLength(), MAX_LENGTH);
+    mvwprintw(missionBoard, 2, 9, "Mission Board");
+    mvwprintw(scoreBoard, 4, 10, "B : %d / %d", snake.getLength(), snake.getMaxLength());
     mvwprintw(scoreBoard, 5, 12, "+ : %d", appleScore);
     mvwprintw(scoreBoard, 6, 12, "- : %d", poisonScore);
     mvwprintw(scoreBoard, 7, 12, "G : %d", gateScore);
@@ -551,11 +554,11 @@ void Map::updateScoreBoard(Snake &snake){
     missionBoard = newwin(10, 30, 13, 55);
     wattron(missionBoard, COLOR_PAIR(10));
     wborder(missionBoard, '.', '.', '-', '-', 'o', 'o', 'o', 'o');
-    mvwprintw(missionBoard, 2, 9, "Mission Board");
-    mvwprintw(missionBoard, 4, 11, "B : %d (%c)", MAX_LENGTH, lengthComplete);
-    mvwprintw(missionBoard, 5, 11, "+ : %d (%c)", MAX_APPLE, appleComplete);
-    mvwprintw(missionBoard, 6, 11, "- : %d (%c)", MAX_POISON, poisonComplete);
-    mvwprintw(missionBoard, 7, 11, "G : %d (%c)", MAX_GATE, gateComplete);
+    
+    mvwprintw(missionBoard, 4, 11, "B : %d (%c)", MAX_LENGTH[stageLevel], lengthComplete);
+    mvwprintw(missionBoard, 5, 11, "+ : %d (%c)", MAX_APPLE[stageLevel], appleComplete);
+    mvwprintw(missionBoard, 6, 11, "- : %d (%c)", MAX_POISON[stageLevel], poisonComplete);
+    mvwprintw(missionBoard, 7, 11, "G : %d (%c)", MAX_GATE[stageLevel], gateComplete);
 
     complete = newwin(10, 35, 8, 8);
     wattron(complete, COLOR_PAIR(10));

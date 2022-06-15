@@ -21,6 +21,7 @@ void Snake::initSnake(char dir) {
     location.push_back(Position(3, 42));
     location.push_back(Position(3, 44));
     length = 6;
+    maxLength = 6;
 }
 bool Snake::isCrashMySelf() {
     bool crash = false;
