@@ -62,9 +62,7 @@ int main() {
         map->generateApple(*snake);
         map->generatePoison(*snake);
         map->generateGate();
-        mvwprintw(scoreBoard, 2, 5, "B: %d / 10", snake->getLength());
-        mvwprintw(scoreBoard, 3, 5, "+: applecount...");
-        wrefresh(scoreBoard);
+        map->updateScoreBoard(*snake);
     }
     getch();
     endwin();
