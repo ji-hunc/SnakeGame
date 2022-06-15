@@ -4,22 +4,22 @@ using namespace std;
 
 Snake::Snake(char dir) {
     direction = dir;
-    location.push_back(Position(3, 24));
-    location.push_back(Position(3, 26));
-    location.push_back(Position(3, 28));
-    location.push_back(Position(3, 30));
-    location.push_back(Position(3, 32));
     location.push_back(Position(3, 34));
+    location.push_back(Position(3, 36));
+    location.push_back(Position(3, 38));
+    location.push_back(Position(3, 40));
+    location.push_back(Position(3, 42));
+    location.push_back(Position(3, 44));
 }
 void Snake::initSnake(char dir) {
     direction = dir;
     location.clear();
-    location.push_back(Position(3, 24));
-    location.push_back(Position(3, 26));
-    location.push_back(Position(3, 28));
-    location.push_back(Position(3, 30));
-    location.push_back(Position(3, 32));
     location.push_back(Position(3, 34));
+    location.push_back(Position(3, 36));
+    location.push_back(Position(3, 38));
+    location.push_back(Position(3, 40));
+    location.push_back(Position(3, 42));
+    location.push_back(Position(3, 44));
     length = 6;
 }
 bool Snake::isCrashMySelf() {

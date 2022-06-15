@@ -46,7 +46,7 @@ void Map::initMap() {
     for (int i=0; i<25; i++) {
         for (int j=0; j<50; j++) {
             if (board[stageLevel][i][j] == '0') {
-                attron(COLOR_PAIR(1));
+                attron(COLOR_PAIR(1));  
                 printw("0");
                 attroff(COLOR_PAIR(1));
             }
@@ -228,6 +228,7 @@ void Map::updateSnake(Snake &snake) {
         }
     }
 
+
     if (snake.isCrashMySelf() || isCrashWithWall(snake.location[0]) || wGameOver) {
         gameover = newwin(10, 35, 8, 8);
         wbkgd(gameover, COLOR_PAIR(10));
@@ -241,8 +242,7 @@ void Map::updateSnake(Snake &snake) {
         clear();
         delwin(gameover);
         endwin();
-        exit(0);
-    }
+
 
     int r = snake.location[0].row;
     int c = snake.location[0].col;
@@ -579,12 +579,14 @@ void Map::updateScoreBoard(Snake &snake){
         curs_set(0);
         noecho();
         scanw("");
+
         
         delwin(complete);
         endwin();
         clear();
         snake.initSnake('l');
         initMap();
+
         appleScore = 0;
         poisonScore = 0;
         gateScore = 0;
@@ -593,8 +595,9 @@ void Map::updateScoreBoard(Snake &snake){
         poisonComplete = ' ';
         gateComplete = ' ';
         isPassing = false;
+        appleCount = 0;
+        poisonCount = 0;
 
-        
     }
     
     
