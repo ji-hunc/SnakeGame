@@ -24,9 +24,22 @@ bool findWall = false;
 bool isPassing = false;
 char outDirection;
 bool exit2;
+WINDOW *scoreBoard; // 점수판
+WINDOW *missionBoard; // 미션판
+WINDOW *complete; // 미션 성공
+WINDOW *gameover; // 미션 실패
+int appleScore = 0;
+int poisonScore = 0;
+int gateScore = 0;
+char lengthComplete = ' ';
+char appleComplete = ' ';
+char poisonComplete = ' ';
+char gateComplete = ' ';
 bool missionComplete = false;
-int testAppleCount;
-
+#define MAX_LENGTH 5
+#define MAX_APPLE 2
+#define MAX_POISON 1
+#define MAX_GATE 1
 
 void Map::initMap() {
     for (int i=0; i<25; i++) {
@@ -164,6 +177,10 @@ void Map::updateSnake(Snake &snake) {
 
     if (snake.location[0].row == gateRow1 && snake.location[0].col == gateCol1 || snake.location[0].row == gateRow2 && snake.location[0].col == gateCol2) {
         isPassing = true;
+        gateScore++;
+        if (gateScore == MAX_GATE){
+            gateComplete = 'O';
+        }
         if (snake.location[0].row == gateRow1 && snake.location[0].col == gateCol1) {
             exit2 = true;
             tuple<int, int, char> temp;
@@ -226,7 +243,10 @@ void Map::updateSnake(Snake &snake) {
     if (r == appleLocation.first && c == appleLocation.second) {
         snake.eatApple(appleLocation.first, appleLocation.second);
         appleCount--;
-        testAppleCount++;
+        appleScore++;
+        if (appleScore == MAX_APPLE){
+            appleComplete = 'O';
+        }
     }
     // eat Poison
     if (r == poisonLocation.first && c == poisonLocation.second) {
@@ -240,6 +260,10 @@ void Map::updateSnake(Snake &snake) {
         attroff(COLOR_PAIR(1));
         snake.eatPoison(poisonLocation.first, poisonLocation.second);
         poisonCount--;
+        poisonScore++;
+        if (poisonScore == MAX_POISON){
+            poisonComplete = 'O';
+        }
     }
     // 머리 출력
     r = snake.location[0].row;
@@ -309,6 +333,12 @@ void Map::updateSnake(Snake &snake) {
     if (snake.getLength() == 4) {
         cout << "GAME OVER" << endl;
         terminate();
+    }
+    if (snake.getLength() >= MAX_LENGTH){
+        lengthComplete = 'O';
+    }
+    else{
+        lengthComplete = ' ';
     }
 
     // 0.5초 대기
@@ -499,23 +529,57 @@ void Map::generateGate() {
     mvprintw(gateRow2, gateCol2+1, "7");
     attroff(COLOR_PAIR(6));
 }
+void Map::updateScoreBoard(Snake &snake){
+    scoreBoard = newwin(10, 30, 2, 55);
+    wbkgd(scoreBoard, COLOR_PAIR(10));
+    wattron(scoreBoard, COLOR_PAIR(10));
+    wborder(scoreBoard, '.','.','-','-','o','o','o','o');
+    mvwprintw(scoreBoard, 2, 9, "Score Board");
+    mvwprintw(scoreBoard, 4, 10, "B : %d / %d", snake.getLength(), MAX_LENGTH);
+    mvwprintw(scoreBoard, 5, 12, "+ : %d", appleScore);
+    mvwprintw(scoreBoard, 6, 12, "- : %d", poisonScore);
+    mvwprintw(scoreBoard, 7, 12, "G : %d", gateScore);
 
-void Map::updateScoreBoard(Snake &snake) {
-    if (testAppleCount > 1) {
+    missionBoard = newwin(10, 30, 13, 55);
+    wattron(missionBoard, COLOR_PAIR(10));
+    wborder(missionBoard, '.', '.', '-', '-', 'o', 'o', 'o', 'o');
+    mvwprintw(missionBoard, 2, 9, "Mission Board");
+    mvwprintw(missionBoard, 4, 11, "B : %d (%c)", MAX_LENGTH, lengthComplete);
+    mvwprintw(missionBoard, 5, 11, "+ : %d (%c)", MAX_APPLE, appleComplete);
+    mvwprintw(missionBoard, 6, 11, "- : %d (%c)", MAX_POISON, poisonComplete);
+    mvwprintw(missionBoard, 7, 11, "G : %d (%c)", MAX_GATE, gateComplete);
+
+    complete = newwin(10, 35, 8, 8);
+    wborder(complete, '.', '.', '-', '-', 'o', 'o', 'o', 'o');
+    mvwprintw(complete, 3, 8, "Mission Complete!!!");
+    mvwprintw(complete, 5, 3, "Press any key to continue game");
+
+    wrefresh(scoreBoard);
+    wrefresh(missionBoard);
+    missionComplete = lengthComplete == 'O' && appleComplete == 'O' && poisonComplete == 'O' && gateComplete == 'O';
+
+    if (missionComplete){
         if (stageLevel == 3) {
-            cout << "CLEARCLEARCLEARCLEARCLEARCLEARCLEARCLEARCLEAR";
             terminate();
         }
         stageLevel++;
-        missionComplete = true;
-    }
-    if (missionComplete) {
-        mvprintw(3, 5, "COMPLETE");
-        clear();
-        usleep(2000000); // 2s
-        initMap();
+        wrefresh(complete);
+        keypad(complete, TRUE);
+        curs_set(0);
+        noecho();
+        
+        scanw("");
         snake.initSnake('l');
-        testAppleCount = 0;
-        missionComplete = false;
+        initMap();
+        delwin(complete);
+        endwin();
+        clear();
+        appleScore = 0;
+        poisonScore = 0;
+        gateScore = 0;
+        lengthComplete = ' ';
+        appleComplete = ' ';
+        poisonComplete = ' ';
+        gateComplete = ' ';
     }
 }
