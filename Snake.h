@@ -13,7 +13,7 @@ private:
 public:
     Snake(char dir);
     vector<Position> location;
-
+    void initSnake(char dir);
     bool isCrashMySelf();
     void setDirection(char dir) {
         direction = dir;
