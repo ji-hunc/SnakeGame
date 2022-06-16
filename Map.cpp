@@ -10,6 +10,7 @@
 #include <unistd.h>
 using namespace std;
 
+char test = 'T';
 extern int userInput;
 extern int appleCount;
 extern int poisonCount;
@@ -41,6 +42,7 @@ const int MAX_LENGTH[4] = {7,8,9,10};
 const int  MAX_APPLE[4] = {2,3,4,5};
 const int  MAX_POISON[4] = {1,2,3,4};
 const int  MAX_GATE[4] = {1,2,3,4};
+char test = 'T';
 
 
 void Map::initMap() {
