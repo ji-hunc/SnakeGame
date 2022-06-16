@@ -52,7 +52,6 @@ int main() {
     
 
     while (true) {
-        map->updateScoreBoard(*snake);
         map->updateSnake(*snake);
         map->getInput(*snake);
         map->updateScoreBoard(*snake);
