@@ -28,6 +28,7 @@ WINDOW *scoreBoard; // 점수판
 WINDOW *missionBoard; // 미션판
 WINDOW *complete; // 미션 성공
 WINDOW *gameover; // 미션 실패
+WINDOW *gameComplete; // 게임 성공
 bool wGameOver = false;
 int appleScore = 0;
 int poisonScore = 0;
@@ -41,6 +42,7 @@ const int MAX_LENGTH[4] = {7,8,9,10};
 const int  MAX_APPLE[4] = {2,3,4,5};
 const int  MAX_POISON[4] = {1,2,3,4};
 const int  MAX_GATE[4] = {1,2,3,4};
+char test = 'T';
 
 
 void Map::initMap() {
@@ -566,6 +568,12 @@ void Map::updateScoreBoard(Snake &snake){
     mvwprintw(complete, 3, 8, "Mission Complete!!!");
     mvwprintw(complete, 5, 3, "Press Enter to continue game");
 
+    gameComplete = newwin(10, 35, 8, 8);
+    wattron(gameComplete, COLOR_PAIR(10));
+    wborder(gameComplete, '.', '.', '-', '-', 'o', 'o', 'o', 'o');
+    mvwprintw(gameComplete, 3, 6, "All Mission Complete!!!");
+    mvwprintw(gameComplete, 5, 5, "Press Enter to quit game");
+
     wrefresh(scoreBoard);
     wrefresh(missionBoard);
     missionComplete = lengthComplete == 'O' && appleComplete == 'O' && poisonComplete == 'O' && gateComplete == 'O';
@@ -573,7 +581,15 @@ void Map::updateScoreBoard(Snake &snake){
 
     if (missionComplete){
         if (stageLevel == 3) {
-            terminate();
+            wrefresh(gameComplete);
+            keypad(gameComplete, TRUE);
+            curs_set(0);
+            noecho();
+            scanw("");
+            clear();
+            delwin(gameComplete);
+            endwin();
+            exit(0);
         }
         stageLevel++;
         wrefresh(complete);
