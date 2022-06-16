@@ -10,7 +10,7 @@
 #include <unistd.h>
 using namespace std;
 
-char test = 'T';
+string test = 'contributorTe';
 extern int userInput;
 extern int appleCount;
 extern int poisonCount;
